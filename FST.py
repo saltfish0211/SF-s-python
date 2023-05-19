@@ -4,13 +4,9 @@ import numpy as np
 import math
 import glob,os
 
-# 第一步：讀取所有xlsx文件
+# 讀取所有xlsx文件
 path = r"D:\ps\NA04" # 這裡替換為你的xlsx文件的路徑
 file = glob.glob(os.path.join(path,"*.csv"))
-
-# 第二步：從每個文件中讀取數據並結合在一起
-
-
 dl = []
 for f in file:
     dl.append(pd.read_csv(f,header=2,usecols=["coords","x", "y"]))
