@@ -16,19 +16,33 @@ for f in file:
     dl.append(pd.read_csv(f,header=2,usecols=["coords","x", "y"]))
 
 print(dl)
-# 第三步：計算動物的移動速度
-dl['dx'] = dl['x'].diff() # diff()是對數據進行差分，也就是相鄰兩點的差值
-dl['dy'] = dl['y'].diff()
-dl['speed'] = np.sqrt(dl['dx']**2 + dl['dy']**2) * (1/15) # 這裡我們假定每15次id為實際時間1秒
+# 合併所有數據
+all_data = pd.concat(dl, ignore_index=True)
 
-# 第四步：判斷動物何時靜止和何時移動
+# 設定閾值
 threshold = 0.1 # 這個閾值需要你根據實際情況設置，也就是動物在水中由於水的流動而產生的輕微浮動
-dl['is_moving'] = dl['speed'] > threshold
 
-# 第五步：計算動物靜止移動的總時長
-moving_time = dl['is_moving'].sum() * (1/15) # 這裡每15次id為實際時間1秒
-total_time = len(dl) * (1/15)
-still_time = total_time - moving_time
+# 計算動物的移動距離並判斷是否超過閾值
+moving_periods = []
+is_moving = False
+for i in range(len(all_data) - 15):
+    dx = all_data.iloc[i+15]['x'] - all_data.iloc[i]['x']
+    dy = all_data.iloc[i+15]['y'] - all_data.iloc[i]['y']
+    distance = np.sqrt(dx**2 + dy**2)
+    
+    if distance > threshold and not is_moving: # 開始移動
+        is_moving = True
+        start_time = i / 15
+    elif distance <= threshold and is_moving: # 停止移動
+        is_moving = False
+        end_time = i / 15
+        moving_periods.append((start_time, end_time))
 
-print(f"動物的移動時間為 {moving_time} 秒")
-print(f"動物的靜止時間為 {still_time} 秒")
+# 如果動物在最後一個數據點仍在移動，我們需要把這段時間也計算在內
+if is_moving:
+    moving_periods.append((start_time, len(all_data) / 15))
+
+# 計算總的移動時間
+total_moving_time = sum(end - start for start, end in moving_periods)
+
+print(f"動物的移動時間為 {total_moving_time} 秒")
