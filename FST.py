@@ -6,7 +6,7 @@ import glob,os
 
 # 讀取所有xlsx文件
 time = 15 #!視頻時間（分鐘）
-fluidspeed = 45 #!速度閾值
+fluidspeed = 1850 #!速度閾值
 sec = 30 #!幀數
 path = r"D:\ps\NA04" # 這裡替換為你的xlsx文件的路徑
 file = glob.glob(os.path.join(path,"*.csv"))
@@ -22,9 +22,9 @@ for d in range(len(dl)):
     MovingTime = 0
     is_moving = False
     for i in range(len(id) - 30):
+        distance_sec = 0
         for j in range(30):#!這邊是判定一秒的總移動距離
             j1 = i+j
-            distance_sec = 0
             plot1 = np.array([x[i],y[i]])
             plot2 = np.array([x[j1+1],y[j1+1]])
             distance = np.linalg.norm(plot1-plot2)
