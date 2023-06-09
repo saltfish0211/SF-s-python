@@ -12,7 +12,7 @@ def muti_data(filepath,picp4,x1,x2,y1,y2):
 
     path = filepath
     file = glob.glob(os.path.join(path,"*.csv"))
-    print(file)
+
     dl = []
     for f in file:
         dl.append(pd.read_csv(f,header=2,usecols=["coords","x", "y"]))
